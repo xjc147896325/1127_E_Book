@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\FreeRTOS\include;..\..\FreeRTOS\port\RVDS\ARM_CM4F;..\..\User\uart;..\..\User\key;..\..\User\led;..\..\User\FATFS;..\..\User\zhengdian_lcd;..\..\User\infra_red</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\FreeRTOS\include;..\..\FreeRTOS\port\RVDS\ARM_CM4F;..\..\User\uart;..\..\User\key;..\..\User\led;..\..\User\FATFS;..\..\User\zhengdian_lcd;..\..\User\infra_red;..\..\User\mp3</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -794,6 +794,11 @@
               <FileName>bsp_infrared.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\infra_red\bsp_infrared.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_mp3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\mp3\bsp_mp3.c</FilePath>
             </File>
           </Files>
         </Group>

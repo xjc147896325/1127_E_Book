@@ -25,6 +25,7 @@
 
 /* 硬件bsp头文件 */
 #include "bsp_led.h"
+#include "bsp_mp3.h"
 #include "bsp_infrared.h"
 #include "bsp_debug_usart.h"
 #include "bsp_key.h"
@@ -543,7 +544,10 @@ static void BSP_Init(void)
 	NVIC_PriorityGroupConfig( NVIC_PriorityGroup_4 );
 	
 	/* LED 初始化 */
-	LED_GPIO_Config();
+	LED_GPIO_Config();	
+	
+	/* LED 初始化 */
+	MP3_GPIO_Config();
 
 	/* DMA初始化	*/
 	USARTx_DMA_Config();
