@@ -547,8 +547,9 @@ static void BSP_Init(void)
 	LED_GPIO_Config();	
 	
 	/* LED 初始化 */
-	MP3_GPIO_Config();
-
+	MP3_Usart_Init();
+	MP3_Control(0);
+	
 	/* DMA初始化	*/
 	USARTx_DMA_Config();
 	/* 串口初始化	*/

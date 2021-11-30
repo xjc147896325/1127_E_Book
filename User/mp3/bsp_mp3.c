@@ -14,73 +14,122 @@
   
 #include "bsp_mp3.h"   
 
+char song_cricle[]={0xAA, 0x18, 0x01, 0x01, 0xC4};
+char song_cricle_5[]={0xAA, 0x19, 0x02, 0x00, 0x05, 0xCA};
+char song0[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xD9};
+char song_noncricle[]={0xAA, 0x18, 0x01, 0x02, 0xC5};
+char song1[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDA};
+char song2[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDB};
+char song3[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDC};
+char song4[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDD};
+char song5[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDE};
+char song6[]={0xAA, 0x08, 0x0B, 0x02, 0x2F, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2A, 0x4D, 0x50, 0x33, 0xDF};
+
+
  /**
   * @brief  初始化控制LED的IO
   * @param  无
   * @retval 无
   */
-void MP3_GPIO_Config(void)
+void MP3_Usart_Init(void)
 {		
-	/*定义一个GPIO_InitTypeDef类型的结构体*/
 	GPIO_InitTypeDef GPIO_InitStructure;
-
-	/*开启LED相关的GPIO外设时钟*/
-	RCC_AHB1PeriphClockCmd ( MP3_CON1_GPIO_CLK|
-						   MP3_CON2_GPIO_CLK|
-						   MP3_CON3_GPIO_CLK, ENABLE); 
-
-	RCC_AHB1PeriphClockCmd ( MP3_IO0_GPIO_CLK|
-						   MP3_IO2_GPIO_CLK|
-						   MP3_IO3_GPIO_CLK|
-						   MP3_IO4_GPIO_CLK|
-						   MP3_IO5_GPIO_CLK|
-						   MP3_IO6_GPIO_CLK|
-						   MP3_IO1_GPIO_CLK, ENABLE); 
-
-	/*选择要控制的GPIO引脚*/														   
-	GPIO_InitStructure.GPIO_Pin = MP3_CON1_PIN|MP3_CON2_PIN;	
-
-	/*设置引脚模式为输出模式*/
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
-
-	/*设置引脚的输出类型为推挽输出*/
+	USART_InitTypeDef USART_InitStructure;
+			
+	RCC_AHB1PeriphClockCmd(MP3_USART_RX_GPIO_CLK|MP3_USART_TX_GPIO_CLK,ENABLE);
+	
+	/* 使能 USART 时钟 */
+	RCC_APB2PeriphClockCmd(MP3_USART_CLK, ENABLE);
+	
+	/* GPIO初始化 */
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-
-	/*设置引脚为上拉模式*/
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-
-
-	/*设置引脚速率为2MHz */   
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 
-
-	/*调用库函数，使用上面配置的GPIO_InitStructure初始化GPIO*/
-	GPIO_Init(MP3_CON1_GPIO_PORT, &GPIO_InitStructure);	
-
-	/*选择要控制的GPIO引脚*/															   
-	GPIO_InitStructure.GPIO_Pin = MP3_CON3_PIN;	
-	/*设置引脚为上拉模式*/
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	
-	GPIO_Init(MP3_CON3_GPIO_PORT, &GPIO_InitStructure);	
-
+	/* 配置Tx引脚为复用功能  */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Pin = MP3_USART_TX_PIN  ;  
+	GPIO_Init(MP3_USART_TX_GPIO_PORT, &GPIO_InitStructure);
 	
-	/*选择要控制的GPIO引脚*/															   
-	GPIO_InitStructure.GPIO_Pin = MP3_IO0_PIN|
-									MP3_IO1_PIN|
-									MP3_IO2_PIN|
-									MP3_IO3_PIN|
-									MP3_IO4_PIN|
-									MP3_IO5_PIN|
-									MP3_IO6_PIN;
-	/*设置引脚为上拉模式*/
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-
-	GPIO_Init(MP3_IO0_GPIO_PORT, &GPIO_InitStructure);	
-
-	MP3_CON1(1);
-	MP3_CON2(1);
-	MP3_CON3(0);
-	MP3_IO0(1);
-		
+	/* 配置Rx引脚为复用功能 */
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Pin = MP3_USART_RX_PIN;
+	GPIO_Init(MP3_USART_RX_GPIO_PORT, &GPIO_InitStructure);
+	
+	/* 连接 PXx 到 USARTx_Tx*/
+	GPIO_PinAFConfig(MP3_USART_RX_GPIO_PORT,MP3_USART_RX_SOURCE,MP3_USART_RX_AF);
+	
+	/*  连接 PXx 到 USARTx__Rx*/
+	GPIO_PinAFConfig(MP3_USART_TX_GPIO_PORT,MP3_USART_TX_SOURCE,MP3_USART_TX_AF);
+	
+	/* 配置串MP3_USART 模式 */
+	/* 波特率设置：MP3_USART_BAUDRATE */
+	USART_InitStructure.USART_BaudRate = MP3_USART_BAUDRATE;
+	/* 字长(数据位+校验位)：8 */
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	/* 停止位：1个停止位 */
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	/* 校验位选择：不使用校验 */
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	/* 硬件流控制：不使用硬件流 */
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	/* USART模式控制：同时使能接收和发送 */
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	/* 完成USART初始化配置 */
+	USART_Init(MP3_USART, &USART_InitStructure); 
+	
+	
+  /* 使能串口 */
+	USART_Cmd(MP3_USART, ENABLE);
 }
+
+void MP3_Control(uint16_t num)
+{
+	switch(num)	{
+		case(0): {
+			Usart_SendString(MP3_USART,song_cricle);
+			Usart_SendString(MP3_USART,song_cricle_5);
+			Usart_SendString(MP3_USART,song0);
+			break;
+		}
+		case(1): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song1);
+			break;
+		}
+		case(2): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song2);
+			break;
+		}
+		case(3): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song3);
+			break;
+		}
+		case(4): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song4);
+			break;
+		}
+		case(5): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song5);
+			break;
+		}
+		case(6): {
+			Usart_SendString(MP3_USART,song_noncricle);
+			Usart_SendString(MP3_USART,song6);
+			break;
+		}
+		default: {
+			Usart_SendString(MP3_USART,song_cricle);
+			Usart_SendString(MP3_USART,song_cricle_5);
+			Usart_SendString(MP3_USART,song0);
+		}
+	}
+	
+	return ;
+}
+
 /*********************************************END OF FILE**********************/
