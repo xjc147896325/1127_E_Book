@@ -211,6 +211,19 @@ void Usart_SendString( USART_TypeDef * pUSARTx, char *str)
 	{}
 }
 
+/*****************  发送定长字符串 **********************/
+void Usart_SendNumString( USART_TypeDef * pUSARTx, char *str, uint8_t num)
+{
+	while(num--) {
+	  Usart_SendByte( pUSARTx, *(str) );
+	  str++;
+	} 
+
+	/* 等待发送完成 */
+	while(USART_GetFlagStatus(pUSARTx,USART_FLAG_TC)==RESET)
+	{}
+}
+
 /*****************  发送一个16位数 **********************/
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch)
 {

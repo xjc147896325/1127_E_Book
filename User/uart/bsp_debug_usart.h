@@ -43,6 +43,7 @@
 void Debug_USART_Config(void);
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch);
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
+void Usart_SendNumString( USART_TypeDef * pUSARTx, char *str, uint8_t num);
 
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);
 

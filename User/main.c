@@ -29,6 +29,7 @@
 #include "bsp_infrared.h"
 #include "bsp_debug_usart.h"
 #include "bsp_key.h"
+#include "bsp_timer.h"
 
 /* 标准库头文件 */
 #include <string.h>
@@ -319,23 +320,33 @@ static void Book_1_Task(void* parameter)
 
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(Infrared_Scan(INFRARED0_GPIO_PORT,INFRARED0_PIN)) {
+				if(!Infrared_Scan(INFRARED0_GPIO_PORT,INFRARED0_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED0_GPIO_PORT,INFRARED0_PIN)) {
+					if(!Infrared_Scan(INFRARED0_GPIO_PORT,INFRARED0_PIN)) {
 						flag = 0;
 					}
 				}
 				else {
-					vTaskDelay(10);
+					if(!Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
+						vTaskDelay(10);
+						if(!Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
+						MP3_Control(1);
+						vTaskDelay(2000);
+						MP3_Control(0);
+						}
+					}
 				}
 			}
 			flag = 1;
 			//do something
+			MP3_Control(2);
+			vTaskDelay(4500);
+			MP3_Control(0);
 			
 			while(flag) {
-				if(Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
+				if(!Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
+					if(!Infrared_Scan(INFRARED1_GPIO_PORT,INFRARED1_PIN)) {
 						flag = 0;
 					}
 				}
@@ -345,7 +356,9 @@ static void Book_1_Task(void* parameter)
 			}
 			flag = 1;
 			//do other thing
-			
+			MP3_Control(3);
+			vTaskDelay(3000);
+			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
 			xSemaphoreGiveFromISR(Book_2_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
@@ -376,9 +389,9 @@ static void Book_2_Task(void* parameter)
 		
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(Infrared_Scan(INFRARED2_GPIO_PORT,INFRARED2_PIN)) {
+				if(!Infrared_Scan(INFRARED2_GPIO_PORT,INFRARED2_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED2_GPIO_PORT,INFRARED2_PIN)) {
+					if(!Infrared_Scan(INFRARED2_GPIO_PORT,INFRARED2_PIN)) {
 						flag = 0;
 					}
 				}
@@ -390,9 +403,9 @@ static void Book_2_Task(void* parameter)
 			//do something
 			
 			while(flag) {
-				if(Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
+				if(!Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
+					if(!Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
 						flag = 0;
 					}
 				}
@@ -432,9 +445,9 @@ static void Book_3_Task(void* parameter)
 		
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+					if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
 						flag = 0;
 					}
 				}
@@ -446,9 +459,9 @@ static void Book_3_Task(void* parameter)
 			//do something
 			
 			while(flag) {
-				if(Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+					if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 						flag = 0;
 					}
 				}
@@ -490,9 +503,9 @@ static void Book_4_Task(void* parameter)
 	
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+					if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
 						flag = 0;
 					}
 				}
@@ -504,9 +517,9 @@ static void Book_4_Task(void* parameter)
 			//do something
 			
 			while(flag) {
-				if(Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 					vTaskDelay(10);
-					if(Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+					if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 						flag = 0;
 					}
 				}
@@ -557,6 +570,8 @@ static void BSP_Init(void)
   
 	/* infrared初始化	*/
 	Infrared_GPIO_Config();
+	
+	TIM14_PWM_Init(499, 83, GPIOA, GPIO_Pin_7); //tim14 ch1
 
 	
 	printf("Init finish\r\n");
