@@ -801,9 +801,9 @@
               <FilePath>..\..\User\mp3\bsp_mp3.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_timer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\timer\bsp_timer.h</FilePath>
+              <FileName>bsp_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\timer\bsp_timer.c</FilePath>
             </File>
           </Files>
         </Group>

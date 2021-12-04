@@ -28,7 +28,12 @@ void LED_GPIO_Config(void)
 	RCC_AHB1PeriphClockCmd ( LED1_GPIO_CLK|
 						   LED2_GPIO_CLK|
 						   LED3_GPIO_CLK|
-						   LED4_GPIO_CLK, ENABLE); 
+						   LED4_GPIO_CLK|
+						   Light0_GPIO_CLK|
+						   Light1_GPIO_CLK|
+						   Light2_GPIO_CLK|
+						   Light3_GPIO_CLK|
+						   Light4_GPIO_CLK, ENABLE); 
 
 	/*选择要控制的GPIO引脚*/															   
 	GPIO_InitStructure.GPIO_Pin = LED1_PIN;	
@@ -54,15 +59,39 @@ void LED_GPIO_Config(void)
 
 	/*选择要控制的GPIO引脚*/															   
 	GPIO_InitStructure.GPIO_Pin = LED3_PIN;	
-	GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);	
 
 	/*选择要控制的GPIO引脚*/															   
 	GPIO_InitStructure.GPIO_Pin = LED4_PIN;	
-	GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStructure);	
+
+
+	/*选择要控制的GPIO引脚*/															   
+	GPIO_InitStructure.GPIO_Pin = Light0_PIN;	
+	GPIO_Init(Light0_GPIO_PORT, &GPIO_InitStructure);	
+
+	/*选择要控制的GPIO引脚*/															   
+	GPIO_InitStructure.GPIO_Pin = Light1_PIN;	
+	GPIO_Init(Light1_GPIO_PORT, &GPIO_InitStructure);	
+
+	/*选择要控制的GPIO引脚*/															   
+	GPIO_InitStructure.GPIO_Pin = Light2_PIN;	
+	GPIO_Init(Light2_GPIO_PORT, &GPIO_InitStructure);	
+
+
+	/*选择要控制的GPIO引脚*/															   
+	GPIO_InitStructure.GPIO_Pin = Light3_PIN;	
+	GPIO_Init(Light3_GPIO_PORT, &GPIO_InitStructure);	
+
+	/*选择要控制的GPIO引脚*/															   
+	GPIO_InitStructure.GPIO_Pin = Light4_PIN;	
+	GPIO_Init(Light4_GPIO_PORT, &GPIO_InitStructure);	
+
 
 
 
 	/*关闭LED灯*/
-	LED_ON;		
+	LED_OFF;		
+	Light_OFF;		
 }
 /*********************************************END OF FILE**********************/

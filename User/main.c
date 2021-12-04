@@ -133,7 +133,6 @@ int main(void)
 static void AppTaskCreate(void)
 {
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */
-	BaseType_t pxHigherPriorityTaskWoken;
 	
 	taskENTER_CRITICAL();           //进入临界区
   
@@ -163,9 +162,7 @@ static void AppTaskCreate(void)
 	printf("Book_4_BinarySem_Handle二值信号量创建成功!\r\n");
 	
 	//给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-	xSemaphoreGiveFromISR(Book_1_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
-	//如果需要的话进行一次任务切换，系统会判断是否需要进行切换
-	portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+	xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 
   /* 创建led_Task任务 */
 	xReturn = xTaskCreate((TaskFunction_t )LED_Task, /* 任务入口函数 */
@@ -212,7 +209,7 @@ static void AppTaskCreate(void)
 						(const char*    )"Book_2_Task",/* 任务名字 */
 						(uint16_t       )512,  /* 任务栈大小 */
 						(void*          )NULL,/* 任务入口函数参数 */
-						(UBaseType_t    )5, /* 任务的优先级 */
+						(UBaseType_t    )6, /* 任务的优先级 */
 						(TaskHandle_t*  )&Book_2_Task_Handle);/* 任务控制块指针 */ 
 	if(pdPASS == xReturn)
 	printf("创建Book_2_Task任务成功!\r\n");
@@ -222,7 +219,7 @@ static void AppTaskCreate(void)
 						(const char*    )"Book_3_Task",/* 任务名字 */
 						(uint16_t       )512,  /* 任务栈大小 */
 						(void*          )NULL,/* 任务入口函数参数 */
-						(UBaseType_t    )5, /* 任务的优先级 */
+						(UBaseType_t    )7, /* 任务的优先级 */
 						(TaskHandle_t*  )&Book_3_Task_Handle);/* 任务控制块指针 */ 
 	if(pdPASS == xReturn)
 	printf("创建Book_3_Task任务成功!\r\n");
@@ -232,7 +229,7 @@ static void AppTaskCreate(void)
 						(const char*    )"Book_4_Task",/* 任务名字 */
 						(uint16_t       )512,  /* 任务栈大小 */
 						(void*          )NULL,/* 任务入口函数参数 */
-						(UBaseType_t    )5, /* 任务的优先级 */
+						(UBaseType_t    )8, /* 任务的优先级 */
 						(TaskHandle_t*  )&Book_4_Task_Handle);/* 任务控制块指针 */ 
 	if(pdPASS == xReturn)
 	printf("创建Book_4_Task任务成功!\r\n");
@@ -310,15 +307,18 @@ static void Book_1_Task(void* parameter)
 {	
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */
 	uint8_t flag = 1;
-	BaseType_t pxHigherPriorityTaskWoken;
-
 
 	while (1) {
 		//获取二值信号量 Book_4_BinarySem_Handle,没获取到则一直等待
 		xReturn = xSemaphoreTake(Book_1_BinarySem_Handle,/* 二值信号量句柄 */
 							  portMAX_DELAY); /* 等待时间 */
+		
+		Light_OFF;
+
 
 		if(pdPASS == xReturn) {
+			Light0(0); //red
+
 			while(flag) {
 				if(!Infrared_Scan(INFRARED0_GPIO_PORT,INFRARED0_PIN)) {
 					vTaskDelay(10);
@@ -339,6 +339,8 @@ static void Book_1_Task(void* parameter)
 			}
 			flag = 1;
 			//do something
+			Light0(1);
+			Light1(0); // green
 			MP3_Control(2);
 			vTaskDelay(4500);
 			MP3_Control(0);
@@ -356,14 +358,14 @@ static void Book_1_Task(void* parameter)
 			}
 			flag = 1;
 			//do other thing
-			MP3_Control(3);
-			vTaskDelay(3000);
+			MP3_Control(5);
+			vTaskDelay(3500);
 			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGiveFromISR(Book_2_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
-			//如果需要的话进行一次任务切换，系统会判断是否需要进行切换
-			portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 
 			vTaskDelay(100);
 		}
@@ -380,13 +382,15 @@ static void Book_2_Task(void* parameter)
 {	
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */
 	uint8_t flag = 1;
-	BaseType_t pxHigherPriorityTaskWoken;
 
 	while (1) {
 		//获取二值信号量 Book_2_BinarySem_Handle,没获取到则一直等待
 		xReturn = xSemaphoreTake(Book_2_BinarySem_Handle,/* 二值信号量句柄 */
 							  portMAX_DELAY); /* 等待时间 */
-		
+
+		xReturn &= xSemaphoreTake(Book_1_BinarySem_Handle,/* 二值信号量句柄 */
+							  portMAX_DELAY); /* 等待时间 */
+
 		if(pdPASS == xReturn) {
 			while(flag) {
 				if(!Infrared_Scan(INFRARED2_GPIO_PORT,INFRARED2_PIN)) {
@@ -401,6 +405,10 @@ static void Book_2_Task(void* parameter)
 			}
 			flag = 1;
 			//do something
+			MP3_Control(3);
+			vTaskDelay(3000);
+			MP3_Control(0);
+			Light2(0);//red
 			
 			while(flag) {
 				if(!Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
@@ -413,15 +421,45 @@ static void Book_2_Task(void* parameter)
 					vTaskDelay(10);
 				}
 			}
+			while(flag) {
+				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+					vTaskDelay(10);
+					if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+						flag = 0;
+					}
+				}
+				else {
+					vTaskDelay(10);
+				}
+			}
+			while(flag) {
+				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+					vTaskDelay(10);
+					if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+						flag = 0;
+					}
+				}
+				else {
+					vTaskDelay(10);
+				}
+			}
 			flag = 1;
 			//do other thing
+			Light2(1);
+			Light3(0);//green
+			MP3_Control(3);
+			vTaskDelay(3000);
+			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGiveFromISR(Book_3_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
-			//如果需要的话进行一次任务切换，系统会判断是否需要进行切换
-			portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+			xSemaphoreGive(Book_3_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 		
 			vTaskDelay(100);
+
 		}
 	}
 }
@@ -436,18 +474,24 @@ static void Book_3_Task(void* parameter)
 {	
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */
 	uint8_t flag = 1;
-	BaseType_t pxHigherPriorityTaskWoken;
+
+
 
 	while (1) {
-		//获取二值信号量 Book_3_BinarySem_Handle,没获取到则一直等待
+	//获取二值信号量 Book_3_BinarySem_Handle,没获取到则一直等待
 		xReturn = xSemaphoreTake(Book_3_BinarySem_Handle,/* 二值信号量句柄 */
 							  portMAX_DELAY); /* 等待时间 */
-		
+		xReturn &= xSemaphoreTake(Book_2_BinarySem_Handle,/* 二值信号量句柄 */
+								  portMAX_DELAY); /* 等待时间 */
+
+		xReturn &= xSemaphoreTake(Book_1_BinarySem_Handle,/* 二值信号量句柄 */
+								  portMAX_DELAY); /* 等待时间 */
+	
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+				if(!Infrared_Scan(INFRARED6_GPIO_PORT,INFRARED6_PIN)) {
 					vTaskDelay(10);
-					if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+					if(!Infrared_Scan(INFRARED6_GPIO_PORT,INFRARED6_PIN)) {
 						flag = 0;
 					}
 				}
@@ -457,28 +501,22 @@ static void Book_3_Task(void* parameter)
 			}
 			flag = 1;
 			//do something
-			
-			while(flag) {
-				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
-					vTaskDelay(10);
-					if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
-						flag = 0;
-					}
-				}
-				else {
-					vTaskDelay(10);
-				}
-			}
-			flag = 1;
-			//do other thing
+			MP3_Control(6);
+			vTaskDelay(5000);
+			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGiveFromISR(Book_4_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
-			//如果需要的话进行一次任务切换，系统会判断是否需要进行切换
-			portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+			xSemaphoreGive(Book_4_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_3_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 			
 
 			vTaskDelay(100);
+
 		}
 	}
 }
@@ -493,14 +531,19 @@ static void Book_4_Task(void* parameter)
 {	
 	BaseType_t xReturn = pdPASS;/* 定义一个创建信息返回值，默认为pdPASS */
 	uint8_t flag = 1;
-	BaseType_t pxHigherPriorityTaskWoken;
-
 	while (1)
 	{
 		//获取二值信号量 Book_4_BinarySem_Handle,没获取到则一直等待
 		xReturn = xSemaphoreTake(Book_4_BinarySem_Handle,/* 二值信号量句柄 */
-							  portMAX_DELAY); /* 等待时间 */
-	
+								  portMAX_DELAY); /* 等待时间 */
+		xReturn = xSemaphoreTake(Book_3_BinarySem_Handle,/* 二值信号量句柄 */
+								  portMAX_DELAY); /* 等待时间 */
+		xReturn &= xSemaphoreTake(Book_2_BinarySem_Handle,/* 二值信号量句柄 */
+								  portMAX_DELAY); /* 等待时间 */
+		xReturn &= xSemaphoreTake(Book_1_BinarySem_Handle,/* 二值信号量句柄 */
+								  portMAX_DELAY); /* 等待时间 */
+
+
 		if(pdPASS == xReturn) {
 			while(flag) {
 				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
@@ -515,7 +558,12 @@ static void Book_4_Task(void* parameter)
 			}
 			flag = 1;
 			//do something
-			
+			MP3_Control(4);
+			vTaskDelay(6000);
+			MP3_Control(0);
+//			Light4(0);//red
+
+
 			while(flag) {
 				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 					vTaskDelay(10);
@@ -529,14 +577,24 @@ static void Book_4_Task(void* parameter)
 			}
 			flag = 1;
 			//do other thing
+			Light4(0);//green
+			MP3_Control(3);
+			vTaskDelay(3000);
+			MP3_Control(0);
+
 			
-			//给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGiveFromISR(Book_1_BinarySem_Handle,&pxHigherPriorityTaskWoken);	//释放二值信号量
-			//如果需要的话进行一次任务切换，系统会判断是否需要进行切换
-			portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_4_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_3_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
+			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+			xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 			
 
 			vTaskDelay(100);
+
 		}
 	}
 }
