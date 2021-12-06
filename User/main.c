@@ -340,7 +340,7 @@ static void Book_1_Task(void* parameter)
 			flag = 1;
 			//do something
 			Light0(1);
-			Light1(0); // green
+			Light2(0); // green
 			MP3_Control(2);
 			vTaskDelay(4500);
 			MP3_Control(0);
@@ -408,7 +408,7 @@ static void Book_2_Task(void* parameter)
 			MP3_Control(3);
 			vTaskDelay(3000);
 			MP3_Control(0);
-			Light2(0);//red
+			Light1(0);//red
 			
 			while(flag) {
 				if(!Infrared_Scan(INFRARED3_GPIO_PORT,INFRARED3_PIN)) {
@@ -421,6 +421,7 @@ static void Book_2_Task(void* parameter)
 					vTaskDelay(10);
 				}
 			}
+			flag = 1;
 			while(flag) {
 				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
 					vTaskDelay(10);
@@ -432,6 +433,7 @@ static void Book_2_Task(void* parameter)
 					vTaskDelay(10);
 				}
 			}
+			flag = 1;
 			while(flag) {
 				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
 					vTaskDelay(10);
@@ -445,7 +447,7 @@ static void Book_2_Task(void* parameter)
 			}
 			flag = 1;
 			//do other thing
-			Light2(1);
+			Light1(1);
 			Light3(0);//green
 			MP3_Control(3);
 			vTaskDelay(3000);
@@ -502,7 +504,7 @@ static void Book_3_Task(void* parameter)
 			flag = 1;
 			//do something
 			MP3_Control(6);
-			vTaskDelay(5000);
+			vTaskDelay(6000);
 			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
@@ -546,9 +548,9 @@ static void Book_4_Task(void* parameter)
 
 		if(pdPASS == xReturn) {
 			while(flag) {
-				if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+				if(!Infrared_Scan(INFRARED7_GPIO_PORT,INFRARED7_PIN)) {
 					vTaskDelay(10);
-					if(!Infrared_Scan(INFRARED4_GPIO_PORT,INFRARED4_PIN)) {
+					if(!Infrared_Scan(INFRARED7_GPIO_PORT,INFRARED7_PIN)) {
 						flag = 0;
 					}
 				}
@@ -565,9 +567,9 @@ static void Book_4_Task(void* parameter)
 
 
 			while(flag) {
-				if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+				if(!Infrared_Scan(INFRARED8_GPIO_PORT,INFRARED8_PIN)) {
 					vTaskDelay(10);
-					if(!Infrared_Scan(INFRARED5_GPIO_PORT,INFRARED5_PIN)) {
+					if(!Infrared_Scan(INFRARED8_GPIO_PORT,INFRARED8_PIN)) {
 						flag = 0;
 					}
 				}
@@ -583,12 +585,12 @@ static void Book_4_Task(void* parameter)
 			MP3_Control(0);
 
 			
-			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGive(Book_4_BinarySem_Handle);	//释放二值信号量
-			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGive(Book_3_BinarySem_Handle);	//释放二值信号量
-			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
-			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
+//			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+//			xSemaphoreGive(Book_4_BinarySem_Handle);	//释放二值信号量
+//			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+//			xSemaphoreGive(Book_3_BinarySem_Handle);	//释放二值信号量
+//			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
+//			xSemaphoreGive(Book_2_BinarySem_Handle);	//释放二值信号量
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
 			xSemaphoreGive(Book_1_BinarySem_Handle);	//释放二值信号量
 			
@@ -607,6 +609,7 @@ static void Book_4_Task(void* parameter)
   *********************************************************************/
 static void BSP_Init(void)
 {
+	uint16_t i = 1000;
 	/*
 	 * STM32中断优先级分组为4，即4bit都用来表示抢占优先级，范围为：0~15
 	 * 优先级分组只需要分组一次即可，以后如果有其他的任务需要用到中断，
@@ -619,6 +622,7 @@ static void BSP_Init(void)
 	
 	/* LED 初始化 */
 	MP3_Usart_Init();
+	while(i--);
 	MP3_Control(0);
 	
 	/* DMA初始化	*/
@@ -631,6 +635,11 @@ static void BSP_Init(void)
 	
 	TIM14_PWM_Init(499, 83, GPIOA, GPIO_Pin_7); //tim14 ch1
 
+	Light0(0);
+	Light1(0);
+	Light2(0);
+	Light3(0);
+	Light4(0);
 	
 	printf("Init finish\r\n");
 }

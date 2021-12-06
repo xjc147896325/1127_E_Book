@@ -38,28 +38,28 @@
 #define LED4_GPIO_PORT            GPIOC                       
 #define LED4_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
-//µÆ0
+//µÆ0 red
 #define Light1_PIN                  GPIO_Pin_9                
 #define Light1_GPIO_PORT            GPIOC                      
 #define Light1_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
-//µÆ1
+//µÆ1 green
 #define Light2_PIN                  GPIO_Pin_10                
 #define Light2_GPIO_PORT            GPIOC                      
 #define Light2_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
-//µÆ2
+//µÆ2 green
 #define Light3_PIN                  GPIO_Pin_11               
 #define Light3_GPIO_PORT            GPIOC                       
 #define Light3_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
-//µÆ3
+//µÆ3 green
 #define Light4_PIN                  GPIO_Pin_12              
 #define Light4_GPIO_PORT            GPIOC                       
 #define Light4_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
-//µÆ4
-#define Light0_PIN                  GPIO_Pin_9                
+//µÆ4 red
+#define Light0_PIN                  GPIO_Pin_8                
 #define Light0_GPIO_PORT            GPIOC                       
 #define Light0_GPIO_CLK             RCC_AHB1Periph_GPIOC
 
