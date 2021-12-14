@@ -24,6 +24,8 @@ void TIM1_PWM_Init(uint16_t arr,uint16_t psc);
 
 void Set_Pwm1(TIM_TypeDef *timx, uint16_t setvalue);
 void Set_Pwm2(TIM_TypeDef *timx, uint16_t setvalue);
+void Set_Pwm3(TIM_TypeDef *timx, uint16_t setvalue);
+void Set_Pwm4(TIM_TypeDef *timx, uint16_t setvalue);
 
 #endif
 

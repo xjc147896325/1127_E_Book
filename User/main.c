@@ -359,7 +359,10 @@ static void Book_1_Task(void* parameter)
 			flag = 1;
 			//do other thing
 			MP3_Control(5);
-			vTaskDelay(3500);
+			Set_Pwm1(TIM14, 50);
+			vTaskDelay(900);
+			Set_Pwm1(TIM14, 0);
+			vTaskDelay(2600);
 			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
@@ -449,8 +452,12 @@ static void Book_2_Task(void* parameter)
 			//do other thing
 			Light1(1);
 			Light3(0);//green
-			MP3_Control(3);
-			vTaskDelay(3000);
+			MP3_Control(3);			
+			Set_Pwm1(TIM4, 50);
+			vTaskDelay(900);
+			Set_Pwm1(TIM4, 0);
+
+			vTaskDelay(2100);
 			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
@@ -503,8 +510,12 @@ static void Book_3_Task(void* parameter)
 			}
 			flag = 1;
 			//do something
-			MP3_Control(6);
-			vTaskDelay(6000);
+			MP3_Control(6);			
+			Set_Pwm2(TIM4, 50);
+			vTaskDelay(900);
+			Set_Pwm2(TIM14, 0);
+
+			vTaskDelay(5100);
 			MP3_Control(0);
 			
 			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
@@ -581,10 +592,33 @@ static void Book_4_Task(void* parameter)
 			//do other thing
 			Light4(0);//green
 			MP3_Control(3);
-			vTaskDelay(3000);
+			Set_Pwm3(TIM4, 50);
+			vTaskDelay(900);
+			Set_Pwm3(TIM4, 0);
+			vTaskDelay(2100);
 			MP3_Control(0);
 
-			
+			while(flag) {
+				if(!Infrared_Scan(INFRARED9_GPIO_PORT,INFRARED9_PIN)) {
+					vTaskDelay(10);
+					if(!Infrared_Scan(INFRARED9_GPIO_PORT,INFRARED9_PIN)) {
+						flag = 0;
+					}
+				}
+				else {
+					vTaskDelay(10);
+				}
+			}
+			flag = 1;	
+			Set_Pwm1(TIM14, 250);
+			Set_Pwm1(TIM4, 250);
+			Set_Pwm2(TIM4, 250);
+			Set_Pwm3(TIM4, 250);
+			vTaskDelay(900);
+			Set_Pwm1(TIM14, 0);
+			Set_Pwm1(TIM4, 0);
+			Set_Pwm2(TIM4, 0);
+			Set_Pwm3(TIM4, 0);
 //			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
 //			xSemaphoreGive(Book_4_BinarySem_Handle);	//释放二值信号量
 //			  //给出二值信号量 ，发送接收到新数据标志，供前台程序查询
@@ -633,7 +667,16 @@ static void BSP_Init(void)
 	/* infrared初始化	*/
 	Infrared_GPIO_Config();
 	
-	TIM14_PWM_Init(499, 83, GPIOA, GPIO_Pin_7); //tim14 ch1
+	TIM14_PWM_Init(1999, 839, GPIOA, GPIO_Pin_7); //tim14 ch1
+	TIM4_PWM_Init(1999, 839, GPIOB, GPIO_Pin_7); //tim4 ch2
+	TIM4_PWM_Init(1999, 839, GPIOB, GPIO_Pin_8); //tim4 ch3
+	TIM4_PWM_Init(1999, 839, GPIOB, GPIO_Pin_9); //tim4 ch4
+
+//	Set_Pwm1(TIM14, 250);
+//	Set_Pwm2(TIM4, 250);
+//	Set_Pwm3(TIM4, 250);
+//	Set_Pwm4(TIM4, 250);
+//	while(1);   /* 正常不会执行到这里 */    
 
 	Light0(0);
 	Light1(0);

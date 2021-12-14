@@ -34,16 +34,16 @@
 #define INFRARED6_GPIO_CLK             RCC_AHB1Periph_GPIOD
 
 #define INFRARED7_PIN                  GPIO_Pin_7                 
-#define INFRARED7_GPIO_PORT            GPIOB                      
-#define INFRARED7_GPIO_CLK             RCC_AHB1Periph_GPIOB
+#define INFRARED7_GPIO_PORT            GPIOE                      
+#define INFRARED7_GPIO_CLK             RCC_AHB1Periph_GPIOE
 
 #define INFRARED8_PIN                  GPIO_Pin_8                 
-#define INFRARED8_GPIO_PORT            GPIOB                      
-#define INFRARED8_GPIO_CLK             RCC_AHB1Periph_GPIOB
+#define INFRARED8_GPIO_PORT            GPIOE                      
+#define INFRARED8_GPIO_CLK             RCC_AHB1Periph_GPIOE
 
 #define INFRARED9_PIN                  GPIO_Pin_9                 
-#define INFRARED9_GPIO_PORT            GPIOB                      
-#define INFRARED9_GPIO_CLK             RCC_AHB1Periph_GPIOB
+#define INFRARED9_GPIO_PORT            GPIOE                      
+#define INFRARED9_GPIO_CLK             RCC_AHB1Periph_GPIOE
 /*******************************************************/
 
  /** 按键按下标置宏
